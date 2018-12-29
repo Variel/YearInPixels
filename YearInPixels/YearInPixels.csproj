@@ -7,6 +7,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Variel.Web.Authentication" Version="2.0.0" />
+    <PackageReference Include="Variel.Web.Session" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

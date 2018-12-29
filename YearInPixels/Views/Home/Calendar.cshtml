@@ -1,0 +1,28 @@
+﻿@model Calendar
+<div id="app">
+    <div>
+        <div class="mt-4 d-flex justify-content-center order-md-1">
+            <div class="text-muted">
+                <div class="day-indicator p-1"></div>
+                <div class="day-indicator text-right py-1 pr-2" v-for="d in 31">
+                    <span v-if="d % 5 === 0">
+                        {{ d }}
+                    </span>
+                </div>
+            </div>
+                <month-view v-for="(month, idx) in months" :month="idx + 1" :days="month.days"></month-view>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/promise-polyfill"></script>
+    <script src="https://unpkg.com/whatwg-fetch"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/locale/ko.js"></script>
+    <script src="~/js/dist.js"></script>
+    <script>
+        app.setCalendarId('@Model.Id');
+    </script>
+}

@@ -5,39 +5,40 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using YearInPixels.Models;
+using YearInPixels.Models.Data;
+using YearInPixels.Services;
 
 namespace YearInPixels.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly DatabaseContext _database;
+
+        public HomeController(DatabaseContext database)
         {
-            return View();
+            _database = database;
         }
 
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
 
-            return View();
+        public async Task<IActionResult> Index()
+        {
+            var calendar = new Calendar();
+
+            _database.Calendars.Add(calendar);
+            await _database.SaveChangesAsync();
+
+            return RedirectToAction("Calendar", new {id = calendar.Id});
         }
 
-        public IActionResult Contact()
+        [Route("{id}")]
+        public async Task<IActionResult> Calendar(string id)
         {
-            ViewData["Message"] = "Your contact page.";
+            var calendar = await _database.Calendars.FindAsync(id);
 
-            return View();
-        }
+            if (calendar == null)
+                return RedirectToAction("Index");
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(calendar);
         }
     }
 }
