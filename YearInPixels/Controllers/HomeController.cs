@@ -22,12 +22,22 @@ namespace YearInPixels.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var id = Request.Cookies["lastCalendarId"];
+
+            if (!String.IsNullOrWhiteSpace(id))
+                return RedirectToAction("Calendar", new {id});
+
+            return RedirectToAction("Create");
+        }
+
+        public async Task<IActionResult> Create()
+        {
             var calendar = new Calendar();
 
             _database.Calendars.Add(calendar);
             await _database.SaveChangesAsync();
 
-            return RedirectToAction("Calendar", new {id = calendar.Id});
+            return RedirectToAction("Calendar", new { id = calendar.Id });
         }
 
         [Route("{id}")]
@@ -36,7 +46,12 @@ namespace YearInPixels.Controllers
             var calendar = await _database.Calendars.FindAsync(id);
 
             if (calendar == null)
+            {
+                Response.Cookies.Delete("lastCalendarId");
                 return RedirectToAction("Index");
+            }
+
+            Response.Cookies.Append("lastCalendarId", calendar.Id);
 
             return View(calendar);
         }
