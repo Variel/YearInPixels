@@ -9,6 +9,7 @@ window.app = new Vue({
         title: '',
         options: [],
         months: [],
+        year: new Date().getYear(),
         calendarId: '',
         defaultColor: '#f4f4f4',
         showCustomizePopup: false
@@ -50,8 +51,9 @@ window.app = new Vue({
                         });
                     }
 
-                    // init calendar name
+                    // init calendar name and year
                     this.title = data.title;
+                    this.year = data.year;
 
                     // init day logs
                     for (let i in data.dayLogs) {

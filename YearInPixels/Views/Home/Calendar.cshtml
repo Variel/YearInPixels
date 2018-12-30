@@ -4,7 +4,8 @@
 }
 <div>
     <div>
-        <div class="mt-4 d-flex justify-content-center order-md-1">
+        <h1 class="mt-4 text-center pl-4">{{ year }}</h1>
+        <div class="d-flex justify-content-center order-md-1">
             <div class="text-muted">
                 <div class="day-indicator p-1"></div>
                 <div class="day-indicator text-right py-1 pr-2" v-for="d in 31">
@@ -21,8 +22,8 @@
             <div class="form-group">
                 <h4 class="text-center mt-4 mb-3 px-5">달력 사용자정의</h4>
                 <label>달력 이름</label>
-                <input type="text" v-model="title" maxlength="64" class="form-control" @@change="updateTitle" />
-                <hr />
+                <input type="text" v-model="title" maxlength="64" class="form-control" @@change="updateTitle"/>
+                <hr/>
                 <label>선택 항목</label>
                 <div class="form-group" v-for="(option, idx) in options">
                     <div class="input-group">

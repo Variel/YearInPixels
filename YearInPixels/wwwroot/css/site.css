@@ -5,6 +5,10 @@ body {
     padding-bottom: 20px;
 }
 
+body, input, textarea, pre, q, blockquote {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
