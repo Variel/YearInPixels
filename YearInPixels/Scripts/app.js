@@ -1,24 +1,19 @@
 ﻿import MonthView from "./Components/MonthView.vue";
+import Popup from "./Components/Popup.vue";
+import ColorPicker from "./Components/ColorPicker.vue";
 
 window.eventBus = new Vue({});
 window.app = new Vue({
     el: '#app',
     data: {
-        selectedDate: null,
+        title: '',
         options: [],
         months: [],
         calendarId: '',
-        defaultColor: '#f4f4f4'
+        defaultColor: '#f4f4f4',
+        showCustomizePopup: false
     },
     methods: {
-        selectOption(option) {
-            if (!this.selectedDate) {
-                return;
-            }
-
-            let dateObject = this.months[this.selectedDate.month - 1].days[this.selectedDate.day - 1];
-            this.$set(dateObject, 'option', option);
-        },
         login() {
 
         },
@@ -54,6 +49,9 @@ window.app = new Vue({
                             days: days
                         });
                     }
+
+                    // init calendar name
+                    this.title = data.title;
 
                     // init day logs
                     for (let i in data.dayLogs) {
@@ -93,6 +91,54 @@ window.app = new Vue({
                         ];
                     }
                 });
+        },
+        removeOption(option) {
+            let index = this.options.indexOf(option);
+            this.options.splice(index, 1);
+
+            this.updateOptions();
+        },
+        addOption() {
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            this.options.push({
+                color: getRandomColor(),
+                label: '',
+            });
+
+            this.updateOptions();
+        },
+        selectColor(option, e) {
+            option.color = e.color;
+
+            this.updateOptions();
+        },
+        updateOptions() {
+            let form = new FormData;
+            form.append('optionsString', JSON.stringify(this.options));
+
+            fetch(`/api/calendars/${this.calendarId}/options`,
+                {
+                    method: 'POST',
+                    body: form
+                });
+        },
+        updateTitle() {
+            let form = new FormData;
+            form.append('title', this.title);
+
+            fetch(`/api/calendars/${this.calendarId}/title`,
+                {
+                    method: 'POST',
+                    body: form
+                });
         }
     },
     computed: {
@@ -105,6 +151,22 @@ window.app = new Vue({
             let options = this.options;
 
             return options[dateObject.option];
+        },
+        minOptionCount() {
+            let max = 0;
+
+            for (let i = 0; i < this.months.length; i++) {
+                let month = this.months[i];
+
+                for (let j = 0; j < month.days.length; j++) {
+                    let day = month.days[j];
+
+                    if (day.option > max)
+                        max = day.option;
+                }
+            }
+
+            return max;
         }
     },
     mounted() {
@@ -124,6 +186,11 @@ window.app = new Vue({
                     this.selectedDate = { month: e.month, day: e.day };
                 }
             });
+
+        eventBus.$on('showCustomizeOptions',
+            (e) => {
+                this.showCustomizePopup = true;
+            });
     },
-    components: { MonthView }
+    components: { MonthView, Popup, ColorPicker }
 });

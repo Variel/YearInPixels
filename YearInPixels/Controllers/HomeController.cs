@@ -32,7 +32,44 @@ namespace YearInPixels.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var calendar = new Calendar();
+            var calendar = new Calendar
+            {
+                Options = new[]
+                {
+                    new Option
+                    {
+                        Label = "너무 행복한 날",
+                        Color = "#0fbcf9"
+                    },
+                    new Option
+                    {
+                        Label = "상쾌한 날",
+                        Color = "#05c46b"
+                    },
+                    new Option
+                    {
+                        Label = "평범한 날",
+                        Color = "#ffd32a"
+                    },
+                    new Option
+                    {
+                        Label = "피곤한 날",
+                        Color = "#f53b57"
+                    },
+                    new Option
+                    {
+                        Label = "상처 받은 날",
+                        Color = "#f53b57"
+                    },
+                    new Option
+                    {
+                        Label = "끔찍한 날",
+                        Color = "#1e272e"
+                    }
+                }
+            };
+
+
 
             _database.Calendars.Add(calendar);
             await _database.SaveChangesAsync();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using YearInPixels.Models.Data;
 using YearInPixels.Services;
 
@@ -27,6 +28,35 @@ namespace YearInPixels.Controllers
                 .SingleOrDefaultAsync(c => c.Id == calendarId);
 
             return Ok(calendar);
+        }
+
+        [HttpPost]
+        [Route("title")]
+        public async Task<IActionResult> UpdateTitle(string calendarId, string title)
+        {
+            var calendar = await _database.Calendars
+                .SingleOrDefaultAsync(c => c.Id == calendarId);
+
+            calendar.Title = title;
+
+            await _database.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("options")]
+        public async Task<IActionResult> UpdateOptions(string calendarId, string optionsString)
+        {
+            var calendar = await _database.Calendars
+                .SingleOrDefaultAsync(c => c.Id == calendarId);
+
+            var options = JsonConvert.DeserializeObject<Option[]>(optionsString);
+            calendar.Options = options;
+
+            await _database.SaveChangesAsync();
+
+            return Ok();
         }
 
         [HttpPost]

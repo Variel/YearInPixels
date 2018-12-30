@@ -11,12 +11,15 @@
                             </span>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                            <span class="dropdown-item" @click="selectOption(null)">
+                            <button class="dropdown-item" @click="selectOption(null)">
                                 <span class="color-thumbnail d-inline-block mr-1" style="width: 13px; height: 13px;" :style="{'background-color': '#f4f4f4'}"></span> 선택 없음
-                            </span>
-                            <span v-for="(option, idx) in options" class="dropdown-item" @click="selectOption(idx)">
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button v-for="(option, idx) in options" class="dropdown-item" @click="selectOption(idx)">
                                 <span class="color-thumbnail d-inline-block mr-1" style="width: 13px; height: 13px;" :style="{'background-color': option.color}"></span> {{option.label}}
-                            </span>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" @click="showCustomizeOptions"><i class="far fa-palette text-success"></i> 사용자정의</button>
                         </div>
                     </div>
                 </div>
@@ -65,6 +68,9 @@
                     method: 'POST',
                     body: data
                 });
+            },
+            showCustomizeOptions() {
+                window.eventBus.$emit('showCustomizeOptions');
             }
         },
         computed: {
