@@ -211,7 +211,7 @@
                 <h4 class="text-center mt-4 mb-3 px-5">내 달력 목록</h4>
                 <div class="list-group mb-3">
                     <a :href="'/' + item.id" class="list-group-item list-group-item-action d-flex align-items-center" v-for="item in myCalendarList" :class="{'active': item.id === calendarId}">
-                        {{ item.title }}
+                        {{ (item.title ? item.title : '이름 없는 달력') }}
                         <span class="badge badge-danger ml-auto" style="height: 19px; display: block; margin-top: 1px;" @@click="deleteCalendar($event, item)" v-if="item.id !== calendarId"><i class="fa fa-times" style="margin-left: 1px"></i></span>
                     </a>
                 </div>

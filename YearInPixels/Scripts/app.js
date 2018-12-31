@@ -137,7 +137,7 @@ window.app = new Vue({
                     this.joinForm.password = '';
                     this.joinForm.passwordConfirm = '';
 
-                    fetch(`/api/calendars/${calendarId}/claimOwnership`)
+                    fetch(`/api/calendars/${this.calendarId}/claimOwnership`)
                         .then(res => res.json())
                         .then(data => {
                             location.reload();
