@@ -1,7 +1,7 @@
 ﻿<template>
     <div class="day border" v-on:click.self="clicked" :class="{selected: dayObject.selected}" :style="{'background-color': backgroundColor}">
         <div class="day-popup-wrap" v-if="dayObject.selected" :style="{'left': popupLeft}">
-            <div class="day-popup mx-auto bg-white rounded border shadow p-2">
+            <div class="day-popup mx-auto bg-white rounded border shadow p-2 mb-5">
                 <div class="d-flex">
                     <div class="btn bg-light">{{month}}월 {{day}}일</div>
                     <div class="dropdown ml-auto">

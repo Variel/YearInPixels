@@ -12,19 +12,154 @@ window.app = new Vue({
         year: new Date().getFullYear(),
         calendarId: '',
         defaultColor: '#f4f4f4',
+        selectedYear: new Date().getFullYear(),
         showCustomizePopup: false,
         showNewCalendarPopup: false,
-        selectedYear: new Date().getFullYear()
+        showLoginPopup: false,
+        showJoinPopup: false,
+        showCalendarListPopup: false,
+        loggedIn: false,
+        loginForm: {
+            email: '',
+            password: ''
+        },
+        joinForm: {
+            email: '',
+            name: '',
+            password: '',
+            passwordConfirm: ''
+        },
+        joinValidation: {},
+        myCalendarList: [],
+        authorities: {
+            view: true,
+        }
     },
     methods: {
-        login() {
+        login(e) {
+            e.preventDefault();
 
+            let form = new FormData;
+            form.append('email', this.loginForm.email);
+            form.append('password', this.loginForm.password);
+
+            fetch('/auth/login',
+                    {
+                        method: 'POST',
+                        body: form
+                    })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.message);
+                        return;
+                    }
+
+                    this.loggedIn = true;
+                    this.showLoginPopup = false;
+                    this.loginForm.email = '';
+                    this.loginForm.password = '';
+
+                    fetch(`/api/calendars/${this.calendarId}/claimOwnership`)
+                        .then(res => res.json())
+                        .then(data => {
+                            location.reload();
+                            if (data.error)
+                                return;
+                        });
+                });
         },
-        join() {
+        join(e) {
+            e.preventDefault();
 
+            let valid = true;
+
+            if (this.joinForm.name.replace(/\s/g, '').length === 0) {
+                valid = false;
+                this.$set(this.joinValidation, 'name', '이름을 입력하세요');
+            } else {
+                this.$set(this.joinValidation, 'name', null);
+            }
+
+            if (this.joinForm.email.replace(/\s/g, '').length === 0) {
+                valid = false;
+                this.$set(this.joinValidation, 'email', '이메일을 입력하세요');
+            } else if (!/^.+@.+\..+$/.test(this.joinForm.email)) {
+                valid = false;
+                this.$set(this.joinValidation, 'email', '올바른 메일을 입력하세요');
+            } else {
+                this.$set(this.joinValidation, 'email', null);
+            }
+
+            if (this.joinForm.password.replace(/\s/g, '').length < 6) {
+                valid = false;
+                this.$set(this.joinValidation, 'password', '6자 이상 입력하세요');
+            } else {
+                this.$set(this.joinValidation, 'password', null);
+            }
+
+            if (this.joinForm.passwordConfirm !== this.joinForm.password) {
+                valid = false;
+                this.$set(this.joinValidation, 'passwordConfirm', '비밀번호와 같게 입력하세요');
+            } else {
+                this.$set(this.joinValidation, 'passwordConfirm', null);
+            }
+
+
+            if (!valid) {
+                return;
+            } else {
+                this.joinValidation = {};
+            }
+
+            let form = new FormData;
+            form.append('email', this.joinForm.email);
+            form.append('name', this.joinForm.name);
+            form.append('password', this.joinForm.password);
+
+            fetch('/auth/join',
+                    {
+                        method: 'POST',
+                        body: form
+                    })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.message);
+                        return;
+                    }
+
+                    this.loggedIn = true;
+                    this.showJoinPopup = false;
+
+                    this.joinForm.name = '';
+                    this.joinForm.email = '';
+                    this.joinForm.password = '';
+                    this.joinForm.passwordConfirm = '';
+
+                    fetch(`/api/calendars/${calendarId}/claimOwnership`)
+                        .then(res => res.json())
+                        .then(data => {
+                            location.reload();
+                            if (data.error)
+                                return;
+                        });
+                });
         },
         logout() {
+            fetch('/auth/logout',
+                    {
+                        method: 'POST'
+                    })
+                .then(res => res.json())
+                .then(data => {
+                    location.reload();
 
+                    if (data.error)
+                        return;
+
+                    this.loggedIn = false;
+                });
         },
         setCalendarId(id) {
             this.calendarId = id;
@@ -142,6 +277,48 @@ window.app = new Vue({
                 {
                     method: 'POST',
                     body: form
+                });
+        },
+        showMyCalendarList() {
+            this.showCalendarListPopup = true;
+
+            fetch('/api/my/calendars')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error)
+                        return;
+
+                    this.myCalendarList = data;
+                });
+        },
+        deleteCalendar(e, calendar) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            if (!confirm('달력은 복구할 수 없습니다.\n정말 삭제하시겠습니까?')) {
+                return;
+            }
+
+            let idx = this.myCalendarList.indexOf(calendar);
+            this.myCalendarList.splice(idx, 1);
+
+            fetch(`/api/calendars/${calendar.id}/delete`,
+                    {
+                        method: 'POST'
+                    })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error)
+                        alert(data.message);
+
+                    fetch('/api/my/calendars')
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.error)
+                                return;
+
+                            this.myCalendarList = data;
+                        });
                 });
         }
     },

@@ -31,7 +31,7 @@ namespace YearInPixels.Controllers
 
             await _session.LoginAsync(account);
 
-            return Ok();
+            return Ok(new { });
         }
 
         public async Task<IActionResult> Join(string email, string password, string name)
@@ -40,13 +40,23 @@ namespace YearInPixels.Controllers
             if (!provider.Check(email))
                 return StatusCode(409, new ErrorResponseModel("이미 가입 된 이메일입니다"));
 
-            await provider.CreateAccountAsync(new Account
+            var account = new Account
             {
                 Email = email,
                 Name = name
-            }, email, password);
+            };
+            await provider.CreateAccountAsync(account, email, password);
 
-            return Ok();
+            await _session.LoginAsync(account);
+
+            return Ok(new { });
+        }
+
+        public IActionResult Logout()
+        {
+            _session.Logout();
+
+            return Ok(new { });
         }
     }
 }

@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Variel.Web.Session;
+using YearInPixels.Helpers;
 using YearInPixels.Models;
 using YearInPixels.Models.Data;
 using YearInPixels.Services;
@@ -13,10 +16,12 @@ namespace YearInPixels.Controllers
     public class HomeController : Controller
     {
         private readonly DatabaseContext _database;
+        private readonly SessionService<Account> _session;
 
-        public HomeController(DatabaseContext database)
+        public HomeController(DatabaseContext database, SessionService<Account> session)
         {
             _database = database;
+            _session = session;
         }
 
 
@@ -32,6 +37,15 @@ namespace YearInPixels.Controllers
 
         public async Task<IActionResult> Create(string title, int? year)
         {
+            var deviceId = Request.Cookies["deviceId"];
+            if (String.IsNullOrWhiteSpace(deviceId))
+            {
+                deviceId = RandomIdentityGenerator.Generate();
+                Response.Cookies.Append("deviceId", deviceId, new CookieOptions { Expires = DateTimeOffset.Now.AddYears(10) });
+            }
+
+            var user = await _session.GetUserAsync();
+
             var calendar = new Calendar
             {
                 Options = new[]
@@ -68,10 +82,11 @@ namespace YearInPixels.Controllers
                     }
                 },
                 Title = title??"나의 기분 달력",
-                Year = year??DateTimeOffset.UtcNow.AddHours(9).Year
+                Year = year??DateTimeOffset.UtcNow.AddHours(9).Year,
+                OwnerDeviceId = deviceId,
+                IsPrivate = true,
+                Owner = user
             };
-
-
 
             _database.Calendars.Add(calendar);
             await _database.SaveChangesAsync();
@@ -90,7 +105,27 @@ namespace YearInPixels.Controllers
                 return RedirectToAction("Index");
             }
 
+            var user = await _session.GetUserAsync();
+
+            if (calendar.OwnerId != null)
+                if (user?.Id != calendar.OwnerId)
+                    if (calendar.SharingOption == CalendarSharingOption.None)
+                    {
+                        ViewBag.HasViewAuthority = false;
+                        return View(calendar);
+                    }
+
+            if (calendar.OwnerDeviceId != null)
+                if (Request.Cookies["deviceId"] != calendar.OwnerDeviceId)
+                    if (calendar.SharingOption == CalendarSharingOption.None)
+                    {
+                        ViewBag.HasViewAuthority = false;
+                        return View(calendar);
+                    }
+
             Response.Cookies.Append("lastCalendarId", calendar.Id);
+
+            ViewBag.HasViewAuthority = true;
 
             return View(calendar);
         }

@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Variel.Web.Session;
 using YearInPixels.Models.Data;
+using YearInPixels.Models.Response;
 using YearInPixels.Services;
 
 namespace YearInPixels.Controllers
@@ -14,10 +16,12 @@ namespace YearInPixels.Controllers
     public class CalendarController : Controller
     {
         private readonly DatabaseContext _database;
+        private readonly SessionService<Account> _session;
 
-        public CalendarController(DatabaseContext database)
+        public CalendarController(DatabaseContext database, SessionService<Account> session)
         {
             _database = database;
+            _session = session;
         }
 
         [Route("")]
@@ -31,6 +35,25 @@ namespace YearInPixels.Controllers
         }
 
         [HttpPost]
+        [Route("delete")]
+        public async Task<IActionResult> DeleteCalendar(string calendarId)
+        {
+            var user = await _session.GetUserAsync();
+            if (user == null)
+                return StatusCode(401, new ErrorResponseModel("로그인이 필요합니다"));
+
+            var calendar = await _database.Calendars.FindAsync(calendarId);
+            if (calendar.OwnerId != user.Id)
+                return StatusCode(403, new ErrorResponseModel("본인의 달력만 삭제할 수 있습니다"));
+
+            _database.Calendars.Remove(calendar);
+
+            await _database.SaveChangesAsync();
+
+            return Ok(new { });
+        }
+
+        [HttpPost]
         [Route("title")]
         public async Task<IActionResult> UpdateTitle(string calendarId, string title)
         {
@@ -41,22 +64,21 @@ namespace YearInPixels.Controllers
 
             await _database.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { });
         }
 
         [HttpPost]
         [Route("options")]
         public async Task<IActionResult> UpdateOptions(string calendarId, string optionsString)
         {
-            var calendar = await _database.Calendars
-                .SingleOrDefaultAsync(c => c.Id == calendarId);
+            var calendar = await _database.Calendars.FindAsync(calendarId);
 
             var options = JsonConvert.DeserializeObject<Option[]>(optionsString);
             calendar.Options = options;
 
             await _database.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { });
         }
 
         [HttpPost]
@@ -77,7 +99,7 @@ namespace YearInPixels.Controllers
 
             await _database.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { });
         }
 
         [HttpPost]
@@ -98,7 +120,31 @@ namespace YearInPixels.Controllers
 
             await _database.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { });
+        }
+
+        [HttpGet]
+        [Route("claimOwnership")]
+        public async Task<IActionResult> ClaimOwnership(string calendarId)
+        {
+            var user = await _session.GetUserAsync();
+            if (user == null)
+                return StatusCode(401, new ErrorResponseModel("로그인이 필요합니다"));
+
+            var calendar = await _database.Calendars.FindAsync(calendarId);
+
+            if (calendar.OwnerId != null)
+                return StatusCode(403, new ErrorResponseModel("이미 소유자가 있는 달력입니다"));
+
+            var deviceId = Request.Cookies["deviceId"];
+            if (calendar.OwnerDeviceId != null && calendar.OwnerDeviceId != deviceId)
+                return StatusCode(403, new ErrorResponseModel("소유할 권한이 없습니다"));
+
+            calendar.Owner = user;
+
+            await _database.SaveChangesAsync();
+
+            return Ok(new { });
         }
     }
 }

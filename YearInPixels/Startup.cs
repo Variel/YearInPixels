@@ -61,6 +61,18 @@ namespace YearInPixels
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.Use(async (ctx, next) =>
+            {
+                var did = ctx.Request.Cookies["deviceId"];
+                if (!String.IsNullOrWhiteSpace(did))
+                {
+                    ctx.Response.Cookies.Append("deviceId", did,
+                        new CookieOptions {Expires = DateTimeOffset.Now.AddYears(10)});
+                }
+
+                await next();
+            });
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

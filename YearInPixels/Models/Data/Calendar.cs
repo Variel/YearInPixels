@@ -30,8 +30,24 @@ namespace YearInPixels.Models.Data
         public ICollection<DayLog> DayLogs { get; set; } = new HashSet<DayLog>();
 
         public long? OwnerId { get; set; }
+        [JsonIgnore]
         public Account Owner { get; set; }
 
+        [MaxLength(32)]
+        public string OwnerDeviceId { get; set; }
+
+        public bool IsPrivate { get; set; }
+        public CalendarSharingOption SharingOption { get; set; }
+
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
+    }
+
+    [Flags]
+    public enum CalendarSharingOption
+    {
+        None = 0,
+        View = 1 << 0,
+        Comment = 1 << 1,
+        Collaborate = 1 << 2
     }
 }
