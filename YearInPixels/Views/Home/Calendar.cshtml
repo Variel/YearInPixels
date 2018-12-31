@@ -21,7 +21,7 @@
         </div>
     </div>
     <popup :visibility="showCustomizePopup" @@onclose="showCustomizePopup = false">
-        <div style="max-height: calc(80vh - 1rem); overflow-y: auto">
+        <div style="max-height: calc(80vh - 1rem); overflow-y: auto; -webkit-overflow-scrolling: touch;">
             <div>
                 <h4 class="text-center mt-4 mb-3 px-5">달력 사용자정의</h4>
                 <div class="form-group">
