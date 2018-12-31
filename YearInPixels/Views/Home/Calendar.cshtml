@@ -21,7 +21,7 @@
         </div>
     </div>
     <popup :visibility="showCustomizePopup" @@onclose="showCustomizePopup = false">
-        <div class="py-2 px-3" style="max-height: 100vh; overflow-y: auto">
+        <div style="max-height: calc(80vh - 1rem); overflow-y: auto">
             <div>
                 <h4 class="text-center mt-4 mb-3 px-5">달력 사용자정의</h4>
                 <div class="form-group">
@@ -53,7 +53,7 @@
         </div>
     </popup>
     <popup :visibility="showNewCalendarPopup" @@onclose="showNewCalendarPopup = false">
-        <form class="py-2 px-3" action="@Url.Action("Create", "Home")">
+        <form action="@Url.Action("Create", "Home")">
             <h4 class="text-center mt-4 mb-3 px-5">새 달력</h4>
             <div class="form-group">
                 <label>달력 이름</label>

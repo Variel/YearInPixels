@@ -1,6 +1,6 @@
 ﻿<template>
-    <div class="popup d-flex justify-content-center align-items-center" v-if="visibility" @click.self="closePopup">
-        <div class="popup-body bg-white shadow border rounded">
+    <div class="popup p-2 d-flex justify-content-center align-items-center" v-if="visibility" @click.self="closePopup">
+        <div class="popup-body bg-white shadow border rounded px-3 py-2">
             <button class="btn btn-close" @click="closePopup"><i class="fa fa-times"></i></button>
             <slot></slot>
         </div>
@@ -39,7 +39,7 @@
     }
 
     .popup-body {
-        max-height: 100vh;
+        max-height: 80vh;
         position: relative;
     }
 

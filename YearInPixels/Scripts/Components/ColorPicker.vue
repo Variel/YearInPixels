@@ -1,5 +1,5 @@
 ﻿<template>
-    <div class="color-picker d-flex flex-wrap">
+    <div class="color-picker d-flex flex-wrap justify-content-center">
         <button class="color-item" v-for="color in colors" :style="{'background-color': color}" @click="selectColor(color)"></button>
     </div>
 </template>
@@ -28,8 +28,8 @@
 
 <style lang="less" scoped>
     .color-picker {
-        width: 150px;
-        height: 120px;
+        width: 153px;
+        height: 123px;
     }
 
     .color-item {
