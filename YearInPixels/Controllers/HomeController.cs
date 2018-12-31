@@ -68,7 +68,7 @@ namespace YearInPixels.Controllers
                     }
                 },
                 Title = title??"나의 기분 달력",
-                Year = year??DateTime.Now.Year
+                Year = year??DateTimeOffset.UtcNow.AddHours(9).Year
             };
 
 
