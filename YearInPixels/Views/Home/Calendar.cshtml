@@ -4,25 +4,30 @@
 }
 <div>
     <div>
-        <h1 class="mt-4 text-center pl-4">{{ year }}</h1>
+        <h1 class="mt-3 text-center pl-2">{{ year }}</h1>
         <div class="d-flex justify-content-center order-md-1">
             <div class="text-muted">
                 <div class="day-indicator p-1"></div>
-                <div class="day-indicator text-right py-1 pr-2" v-for="d in 31">
+                <div class="day-indicator text-right py-1 pr-1" v-for="d in 31">
                     <span v-if="d % 5 === 0">
                         {{ d }}
                     </span>
                 </div>
             </div>
             <month-view v-for="(month, idx) in months" :month="idx + 1" :days="month.days"></month-view>
+            <div>
+                <div class="day-indicator" style="width: 12px;"></div>
+            </div>
         </div>
     </div>
     <popup :visibility="showCustomizePopup" @@onclose="showCustomizePopup = false">
         <div class="py-2 px-3" style="max-height: 100vh; overflow-y: auto">
-            <div class="form-group">
+            <div>
                 <h4 class="text-center mt-4 mb-3 px-5">달력 사용자정의</h4>
-                <label>달력 이름</label>
-                <input type="text" v-model="title" maxlength="64" class="form-control" @@change="updateTitle"/>
+                <div class="form-group">
+                    <label>달력 이름</label>
+                    <input type="text" v-model="title" maxlength="64" class="form-control" @@change="updateTitle"/>
+                </div>
                 <hr/>
                 <label>선택 항목</label>
                 <div class="form-group" v-for="(option, idx) in options">
@@ -46,6 +51,37 @@
                 </div>
             </div>
         </div>
+    </popup>
+    <popup :visibility="showNewCalendarPopup" @@onclose="showNewCalendarPopup = false">
+        <form class="py-2 px-3" action="@Url.Action("Create", "Home")">
+            <h4 class="text-center mt-4 mb-3 px-5">새 달력</h4>
+            <div class="form-group">
+                <label>달력 이름</label>
+                <input class="form-control" name="title" placeholder="나의 기분 달력" />
+            </div>
+            <div class="form-group">
+                <label>달력 년도</label>
+                <div class="input-group justify-content-center mt-2 mb-5">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-primary" type="button" @@click="selectedYear-=1">
+                            <i class="fa fa-angle-left"></i>
+                        </button>
+                    </div>
+                    <div type="text" class="border px-4 py-2" style="font-size: 40px;">
+                        {{selectedYear}}
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary" type="button" @@click="selectedYear+=1">
+                            <i class="fa fa-angle-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <input class="form-control" name="year" type="hidden" :value="selectedYear"/>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-block btn-outline-success" type="submit">달력 만들기</button>
+            </div>
+        </form>
     </popup>
 </div>
 

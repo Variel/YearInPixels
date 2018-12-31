@@ -9,10 +9,12 @@ window.app = new Vue({
         title: '',
         options: [],
         months: [],
-        year: new Date().getYear(),
+        year: new Date().getFullYear(),
         calendarId: '',
         defaultColor: '#f4f4f4',
-        showCustomizePopup: false
+        showCustomizePopup: false,
+        showNewCalendarPopup: false,
+        selectedYear: new Date().getFullYear()
     },
     methods: {
         login() {

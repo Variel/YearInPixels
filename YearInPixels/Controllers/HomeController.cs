@@ -30,7 +30,7 @@ namespace YearInPixels.Controllers
             return RedirectToAction("Create");
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(string title, int? year)
         {
             var calendar = new Calendar
             {
@@ -59,14 +59,16 @@ namespace YearInPixels.Controllers
                     new Option
                     {
                         Label = "상처 받은 날",
-                        Color = "#f53b57"
+                        Color = "#3c40c6"
                     },
                     new Option
                     {
                         Label = "끔찍한 날",
                         Color = "#1e272e"
                     }
-                }
+                },
+                Title = title??"나의 기분 달력",
+                Year = year??DateTime.Now.Year
             };
 
 
