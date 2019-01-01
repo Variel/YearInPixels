@@ -108,12 +108,19 @@ namespace YearInPixels.Controllers
             var user = await _session.GetUserAsync();
 
             if (calendar.OwnerId != null)
+            {
                 if (user?.Id != calendar.OwnerId)
+                {
                     if (calendar.SharingOption == CalendarSharingOption.None)
                     {
                         ViewBag.HasViewAuthority = false;
                         return View(calendar);
                     }
+                }
+
+                ViewBag.HasViewAuthority = true;
+                return View(calendar);
+            }
 
             if (calendar.OwnerDeviceId != null)
                 if (Request.Cookies["deviceId"] != calendar.OwnerDeviceId)
