@@ -47,3 +47,7 @@ body, input, textarea, pre, q, blockquote {
     margin-right: -1px;
     font-size: 12px;
 }
+
+[v-cloak] {
+    display: none;
+}
