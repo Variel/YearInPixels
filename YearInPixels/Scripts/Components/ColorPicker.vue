@@ -28,8 +28,9 @@
 
 <style lang="less" scoped>
     .color-picker {
-        width: 153px;
-        height: 123px;
+        box-sizing: content-box;
+        width: 150px;
+        height: 120px;
     }
 
     .color-item {

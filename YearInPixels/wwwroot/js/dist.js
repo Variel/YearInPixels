@@ -297,7 +297,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Com
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ \"./node_modules/css-loader/lib/css-base.js\")(false);\n// imports\n\n\n// module\nexports.push([module.i, \".color-picker[data-v-3aa07226] {\\n  width: 153px;\\n  height: 123px;\\n}\\n.color-item[data-v-3aa07226] {\\n  display: block;\\n  border: none;\\n  outline: none;\\n  width: 30px;\\n  height: 30px;\\n}\\n\", \"\"]);\n\n// exports\n\n\n//# sourceURL=webpack:///./Scripts/Components/ColorPicker.vue?./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib??vue-loader-options");
+eval("exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ \"./node_modules/css-loader/lib/css-base.js\")(false);\n// imports\n\n\n// module\nexports.push([module.i, \".color-picker[data-v-3aa07226] {\\n  box-sizing: content-box;\\n  width: 150px;\\n  height: 120px;\\n}\\n.color-item[data-v-3aa07226] {\\n  display: block;\\n  border: none;\\n  outline: none;\\n  width: 30px;\\n  height: 30px;\\n}\\n\", \"\"]);\n\n// exports\n\n\n//# sourceURL=webpack:///./Scripts/Components/ColorPicker.vue?./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib??vue-loader-options");
 
 /***/ }),
 
