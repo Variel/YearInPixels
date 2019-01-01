@@ -1,11 +1,11 @@
 ﻿<template>
     <div class="day border" v-on:click.self="clicked" :class="{selected: dayObject.selected}" :style="{'background-color': backgroundColor}">
-        <div class="day-popup-wrap" v-if="dayObject.selected" :style="{'left': popupLeft}">
+        <div class="day-popup-wrap d-block d-md-none" v-if="dayObject.selected" :style="{'left': popupLeft}">
             <div class="day-popup mx-auto bg-white rounded border shadow p-2 mb-5">
                 <div class="d-flex">
                     <div class="btn bg-light">{{month}}월 {{day}}일</div>
                     <div class="dropdown ml-auto">
-                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span>
                                 <span class="color-thumbnail d-inline-block mr-1" style="width: 13px; height: 13px;" :style="{'background-color': backgroundColor}"></span> {{label}}
                             </span>

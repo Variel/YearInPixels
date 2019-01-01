@@ -11,6 +11,7 @@ window.app = new Vue({
         months: [],
         year: new Date().getFullYear(),
         calendarId: '',
+        selectedDate: null,
         defaultColor: '#f4f4f4',
         selectedYear: new Date().getFullYear(),
         showCustomizePopup: false,
@@ -320,6 +321,35 @@ window.app = new Vue({
                             this.myCalendarList = data;
                         });
                 });
+        },
+        selectOption(e) {
+            this.$set(this.dayObject, 'option', e);
+
+            let data = new FormData;
+            data.append('optionId', e);
+
+            fetch(`/api/calendars/${app.calendarId}/${this.selectedDate.month}/${this.selectedDate.day}/option`, {
+                method: 'POST',
+                body: data
+            });
+        },
+        noteChanged(e) {
+            let data = new FormData;
+            data.append('note', this.dayObject.note);
+
+            fetch(`/api/calendars/${app.calendarId}/${this.selectedDate.month}/${this.selectedDate.day}/note`, {
+                method: 'POST',
+                body: data
+            });
+        },
+        calculateEditorWidth() {
+            let wrapElem = this.$refs['selected-day-wrap'];
+            let targetElem = this.$refs['selected-day-edit'];
+
+            if (!wrapElem || !targetElem)
+                return;
+
+            $(targetElem).width($(wrapElem).width());
         }
     },
     computed: {
@@ -331,7 +361,16 @@ window.app = new Vue({
             let dateObject = this.months[this.selectedDate.month - 1].days[this.selectedDate.day - 1];
             let options = this.options;
 
-            return options[dateObject.option];
+            if (dateObject.option)
+                return options[dateObject.option];
+
+            return null;
+        },
+        dayObject() {
+            if (this.selectedDate) {
+                return this.months[this.selectedDate.month - 1].days[this.selectedDate.day - 1];
+            }
+            return null;
         },
         minOptionCount() {
             let max = 0;
@@ -360,18 +399,22 @@ window.app = new Vue({
 
                     if (selected.month !== e.month || selected.day !== e.day) {
                         this.$set(this.months[e.month - 1].days[e.day - 1], 'selected', true);
-                        this.selectedDate = { month: e.month, day: e.day };
+                        this.selectedDate = { month: e.month, day: e.day, option: this.months[selected.month - 1].days[selected.day - 1].option };
                     }
                 } else {
                     this.$set(this.months[e.month - 1].days[e.day - 1], 'selected', true);
-                    this.selectedDate = { month: e.month, day: e.day };
+                    this.selectedDate = { month: e.month, day: e.day, option: this.months[e.month - 1].days[e.day - 1].option };
                 }
+
+                this.$nextTick(() => this.calculateEditorWidth());
             });
 
         eventBus.$on('showCustomizeOptions',
             (e) => {
                 this.showCustomizePopup = true;
             });
+
+        window.addEventListener('resize', this.calculateEditorWidth);
     },
     components: { MonthView, Popup, ColorPicker }
 });

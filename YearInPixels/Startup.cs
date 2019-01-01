@@ -56,7 +56,7 @@ namespace YearInPixels
 
             database.Database.Migrate();
 
-            app.UseSession();
+            app.UseSession(new SessionOptions{IdleTimeout = TimeSpan.FromDays(365)});
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
