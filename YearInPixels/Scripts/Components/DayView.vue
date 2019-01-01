@@ -50,6 +50,11 @@
                 });
             },
             selectOption(e) {
+                if (!app.authorities.collaborate) {
+                    alert('편집할 권한이 없습니다!');
+                    return;
+                }
+
                 this.$set(this.dayObject, 'option', e);
 
                 let data = new FormData;
@@ -61,6 +66,11 @@
                 });
             },
             noteChanged(e) {
+                if (!app.authorities.collaborate) {
+                    alert('편집할 권한이 없습니다!');
+                    return;
+                }
+
                 let data = new FormData;
                 data.append('note', this.dayObject.note);
 

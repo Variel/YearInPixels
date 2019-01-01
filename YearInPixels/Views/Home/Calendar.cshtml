@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css?family=Noto+Sans+KR" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-LRlmVvLKVApDVGuspQFnRQJjkv0P7/YFrw84YYQtmYG4nK8c+M+NlmYDCv0rKWpG" crossorigin="anonymous">
-    <link rel="stylesheet" href="~/css/site.css?v=2019-01-02.2">
+    <link rel="stylesheet" href="~/css/site.css?v=2019-01-02.4">
+
     <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
@@ -45,7 +46,10 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
             <div class="container">
                 <img src="/images/logo_transparent.png" class="mr-2" style="max-height: 30px"/>
-                <button class="btn btn-success mr-auto" @@click="showCustomizePopup = true"><i class="far fa-palette"></i> {{ title }}</button>
+                <div class="mr-auto">
+                    <button class="btn btn-success" @@click="showCustomizePopup = true"><i class="far fa-palette"></i> {{ title }}</button>
+                    <button class="btn btn-info d-none d-sm-inline-block" @@click="showSharePopup = true" v-if="loggedIn"><i class="fa fa-link"></i></button>
+                </div>
 
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -53,6 +57,9 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ml-0 ml-lg-2 mt-2 mt-lg-0">
+                        <li class="nav-item" v-if="loggedIn">
+                            <button class="nav-link btn btn-block text-left btn-info text-light text-center d-sm-none" @@click="showSharePopup = true"><i class="fa fa-link"></i> 달력 공유</button>
+                        </li>
                         <li class="nav-item" v-if="loggedIn">
                             <span class="nav-link" @@click="showMyCalendarList">내 달력 목록</span>
                         </li>
@@ -136,9 +143,9 @@
                             <h4 class="text-center mt-4 mb-3 px-5">달력 사용자정의</h4>
                             <div class="form-group">
                                 <label>달력 이름</label>
-                                <input type="text" v-model="title" maxlength="64" class="form-control" @@change="updateTitle"/>
+                                <input type="text" v-model="title" maxlength="64" class="form-control" @@change="updateTitle" />
                             </div>
-                            <hr/>
+                            <hr />
                             <label>선택 항목</label>
                             <div class="form-group" v-for="(option, idx) in options">
                                 <div class="input-group">
@@ -174,7 +181,7 @@
                     <h4 class="text-center mt-4 mb-3 px-5">새 달력</h4>
                     <div class="form-group">
                         <label>달력 이름</label>
-                        <input class="form-control" name="title" placeholder="나의 기분 달력"/>
+                        <input class="form-control" name="title" placeholder="나의 기분 달력" />
                     </div>
                     <div class="form-group">
                         <label>달력 년도</label>
@@ -193,7 +200,7 @@
                                 </button>
                             </div>
                         </div>
-                        <input class="form-control" name="year" type="hidden" :value="selectedYear"/>
+                        <input class="form-control" name="year" type="hidden" :value="selectedYear" />
                     </div>
                     <div class="form-group">
                         <button class="btn btn-block btn-outline-success" type="submit">달력 만들기</button>
@@ -205,11 +212,11 @@
                     <h4 class="text-center mt-4 mb-3 px-5">로그인</h4>
                     <div class="form-group">
                         <label>이메일</label>
-                        <input type="text" class="form-control" v-model="loginForm.email" placeholder="sample@email.com" autocomplete="on"/>
+                        <input type="text" class="form-control" v-model="loginForm.email" placeholder="sample@email.com" autocomplete="on" />
                     </div>
                     <div class="form-group">
                         <label>비밀번호</label>
-                        <input type="password" class="form-control" v-model="loginForm.password" placeholder="비밀번호" autocomplete="on"/>
+                        <input type="password" class="form-control" v-model="loginForm.password" placeholder="비밀번호" autocomplete="on" />
                     </div>
                     <div class="form-group mt-4">
                         <button class="btn btn-block btn-outline-success" type="submit">로그인</button>
@@ -226,7 +233,7 @@
                                 {{joinValidation.name}}
                             </small>
                         </label>
-                        <input type="text" class="form-control" v-model="joinForm.name" placeholder="김지희" :class="{'is-invalid': joinValidation.name}" autocomplete="on"/>
+                        <input type="text" class="form-control" v-model="joinForm.name" placeholder="김지희" :class="{'is-invalid': joinValidation.name}" autocomplete="on" />
                     </div>
                     <div class="form-group">
                         <label class="d-flex">
@@ -235,7 +242,7 @@
                                 {{joinValidation.email}}
                             </small>
                         </label>
-                        <input type="text" class="form-control" v-model="joinForm.email" placeholder="sample@email.com" :class="{'is-invalid': joinValidation.email}" autocomplete="on"/>
+                        <input type="text" class="form-control" v-model="joinForm.email" placeholder="sample@email.com" :class="{'is-invalid': joinValidation.email}" autocomplete="on" />
                     </div>
                     <div class="form-group">
                         <label class="d-flex">
@@ -244,7 +251,7 @@
                                 {{joinValidation.password}}
                             </small>
                         </label>
-                        <input type="password" class="form-control" v-model="joinForm.password" placeholder="비밀번호" :class="{'is-invalid': joinValidation.password}" autocomplete="on"/>
+                        <input type="password" class="form-control" v-model="joinForm.password" placeholder="비밀번호" :class="{'is-invalid': joinValidation.password}" autocomplete="on" />
                     </div>
                     <div class="form-group">
                         <label class="d-flex">
@@ -253,7 +260,7 @@
                                 {{joinValidation.passwordConfirm}}
                             </small>
                         </label>
-                        <input type="password" class="form-control" v-model="joinForm.passwordConfirm" placeholder="비밀번호 확인" :class="{'is-invalid': joinValidation.passwordConfirm}" autocomplete="on"/>
+                        <input type="password" class="form-control" v-model="joinForm.passwordConfirm" placeholder="비밀번호 확인" :class="{'is-invalid': joinValidation.passwordConfirm}" autocomplete="on" />
                     </div>
                     <div class="form-group mt-4">
                         <button class="btn btn-block btn-outline-success" type="submit">가입</button>
@@ -269,7 +276,29 @@
                     </a>
                 </div>
             </popup>
-            <hr/>
+            <popup :visibility="showSharePopup" @@onclose="showSharePopup = false">
+                <h4 class="text-center mt-4 mb-3 px-5">달력 공유하기</h4>
+                <div class="form-group">
+                    <label>링크 공유</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-link"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="https://yip.variel.kr" :value="'https://yip.variel.kr/' + calendarId" ref="share-url">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" @@click="copyUrl" data-toggle="tooltip" data-placement="top" title="복사 됨"><i class="fa fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-4">
+                    <label>링크를 가진 사람이</label>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="chk-authority-view" @@change="changeViewAuthority" v-model="sharingOptions.view">
+                        <label class="custom-control-label" for="chk-authority-view">보기 가능</label>
+                    </div>
+                </div>
+            </popup>
+            <hr />
             <footer>
                 <p>&copy; Variel Creatives @DateTimeOffset.Now.Year</p>
             </footer>
@@ -284,7 +313,7 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/locale/ko.js"></script>
-    <script src="~/js/dist.js?v=2019-01-02.2"></script>
+    <script src="~/js/dist.js?v=2019-01-02.4"></script>
     <script>
         app.setCalendarId('@Model.Id');
     </script>
@@ -304,6 +333,18 @@
     {
         <script>
             app.authorities.view = false;
+        </script>
+    }
+    @if((ViewBag.HasCollaborateAuthority ?? false) == true)
+    {
+        <script>
+            app.authorities.collaborate = true;
+        </script>
+    }
+    else
+    {
+        <script>
+            app.authorities.collaborate = false;
         </script>
     }
 </body>

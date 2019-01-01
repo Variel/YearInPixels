@@ -27,6 +27,9 @@ namespace YearInPixels.Controllers
         [Route("")]
         public async Task<IActionResult> GetCalendar(string calendarId)
         {
+            if (!await HasAuthorityAsync(calendarId, CalendarSharingOption.View))
+                return StatusCode(403, new ErrorResponseModel("볼 권한이 없습니다"));
+
             var calendar = await _database.Calendars
                 .Include(c => c.DayLogs)
                 .SingleOrDefaultAsync(c => c.Id == calendarId);
@@ -57,6 +60,9 @@ namespace YearInPixels.Controllers
         [Route("title")]
         public async Task<IActionResult> UpdateTitle(string calendarId, string title)
         {
+            if (!await HasAuthorityAsync(calendarId, CalendarSharingOption.Collaborate))
+                return StatusCode(403, new ErrorResponseModel("편집할 권한이 없습니다"));
+
             var calendar = await _database.Calendars
                 .SingleOrDefaultAsync(c => c.Id == calendarId);
 
@@ -71,6 +77,9 @@ namespace YearInPixels.Controllers
         [Route("options")]
         public async Task<IActionResult> UpdateOptions(string calendarId, string optionsString)
         {
+            if (!await HasAuthorityAsync(calendarId, CalendarSharingOption.Collaborate))
+                return StatusCode(403, new ErrorResponseModel("편집할 권한이 없습니다"));
+
             var calendar = await _database.Calendars.FindAsync(calendarId);
 
             var options = JsonConvert.DeserializeObject<Option[]>(optionsString);
@@ -85,6 +94,9 @@ namespace YearInPixels.Controllers
         [Route("{month}/{day}/option")]
         public async Task<IActionResult> SelectOption(string calendarId, int month, int day, int? optionId)
         {
+            if (!await HasAuthorityAsync(calendarId, CalendarSharingOption.Collaborate))
+                return StatusCode(403, new ErrorResponseModel("편집할 권한이 없습니다"));
+
             var log = await _database.DayLogs.FindAsync(calendarId, month, day);
             if (log == null)
             {
@@ -106,7 +118,11 @@ namespace YearInPixels.Controllers
         [Route("{month}/{day}/note")]
         public async Task<IActionResult> EditNote(string calendarId, int month, int day, string note)
         {
+            if (!await HasAuthorityAsync(calendarId, CalendarSharingOption.Collaborate))
+                return StatusCode(403, new ErrorResponseModel("편집할 권한이 없습니다"));
+
             var log = await _database.DayLogs.FindAsync(calendarId, month, day);
+
             if (log == null)
             {
                 log = new DayLog {CalendarId = calendarId, Month = month, Day = day};
@@ -145,6 +161,63 @@ namespace YearInPixels.Controllers
             await _database.SaveChangesAsync();
 
             return Ok(new { });
+        }
+
+        [HttpPost]
+        [Route("authorities/view")]
+        public async Task<IActionResult> UpdateViewAuthority(string calendarId, bool value)
+        {
+            var user = await _session.GetUserAsync();
+            if (user == null)
+                return StatusCode(401, new ErrorResponseModel("로그인이 필요합니다"));
+
+            var calendar = await _database.Calendars.FindAsync(calendarId);
+            if (calendar.OwnerId != user.Id)
+                return StatusCode(403, new ErrorResponseModel("본인의 달력만 권한을 편집할 수 있습니다"));
+
+            if (value)
+                calendar.SharingOption |= CalendarSharingOption.View;
+            else
+                calendar.SharingOption &= ~CalendarSharingOption.View;
+
+            await _database.SaveChangesAsync();
+
+            return Ok(new { });
+        }
+
+        private async Task<bool> HasAuthorityAsync(string calendarId, CalendarSharingOption authority)
+        {
+            var calendar = await _database.Calendars.FindAsync(calendarId);
+
+            if (calendar == null)
+            {
+                Response.Cookies.Delete("lastCalendarId");
+                return false;
+            }
+
+            var user = await _session.GetUserAsync();
+
+            if (calendar.OwnerId != null)
+            {
+                if (user?.Id != calendar.OwnerId)
+                {
+                    if ((calendar.SharingOption & authority) != authority)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            if (calendar.OwnerDeviceId != null)
+                if (Request.Cookies["deviceId"] != calendar.OwnerDeviceId)
+                    if ((calendar.SharingOption & authority) != authority)
+                    {
+                        return false;
+                    }
+
+            return true;
         }
     }
 }

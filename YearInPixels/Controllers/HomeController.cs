@@ -107,6 +107,7 @@ namespace YearInPixels.Controllers
 
             var user = await _session.GetUserAsync();
 
+            ViewBag.HasCollaborateAuthority = false;
             if (calendar.OwnerId != null)
             {
                 if (user?.Id != calendar.OwnerId)
@@ -116,6 +117,10 @@ namespace YearInPixels.Controllers
                         ViewBag.HasViewAuthority = false;
                         return View(calendar);
                     }
+                }
+                else
+                {
+                    ViewBag.HasCollaborateAuthority = true;
                 }
 
                 ViewBag.HasViewAuthority = true;

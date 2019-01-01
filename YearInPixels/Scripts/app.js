@@ -11,6 +11,9 @@ window.app = new Vue({
         months: [],
         year: new Date().getFullYear(),
         calendarId: '',
+        sharingOptions: {
+            view: false
+        },
         selectedDate: null,
         defaultColor: '#f4f4f4',
         selectedYear: new Date().getFullYear(),
@@ -19,6 +22,7 @@ window.app = new Vue({
         showLoginPopup: false,
         showJoinPopup: false,
         showCalendarListPopup: false,
+        showSharePopup: false,
         loggedIn: false,
         loginForm: {
             email: '',
@@ -34,6 +38,7 @@ window.app = new Vue({
         myCalendarList: [],
         authorities: {
             view: true,
+            collaborate: false,
         }
     },
     methods: {
@@ -203,6 +208,10 @@ window.app = new Vue({
                         this.$set(this.months[log.month - 1].days, log.day - 1, log);
                     }
 
+                    const VIEW_OPTION = 1;
+                    // init sharing options
+                    this.sharingOptions.view = (data.sharingOption & VIEW_OPTION) === VIEW_OPTION;
+
                     // init options
                     if (data.options) {
                         this.options = data.options;
@@ -239,6 +248,11 @@ window.app = new Vue({
             this.updateOptions();
         },
         addOption() {
+            if (!this.authorities.collaborate) {
+                alert('편집할 권한이 없습니다!');
+                return;
+            }
+
             function getRandomColor() {
                 var letters = '0123456789ABCDEF';
                 var color = '#';
@@ -256,11 +270,21 @@ window.app = new Vue({
             this.updateOptions();
         },
         selectColor(option, e) {
+            if (!this.authorities.collaborate) {
+                alert('편집할 권한이 없습니다!');
+                return;
+            }
+
             option.color = e.color;
 
             this.updateOptions();
         },
         updateOptions() {
+            if (!this.authorities.collaborate) {
+                alert('편집할 권한이 없습니다!');
+                return;
+            }
+
             let form = new FormData;
             form.append('optionsString', JSON.stringify(this.options));
 
@@ -271,6 +295,11 @@ window.app = new Vue({
                 });
         },
         updateTitle() {
+            if (!this.authorities.collaborate) {
+                alert('편집할 권한이 없습니다!');
+                return;
+            }
+
             let form = new FormData;
             form.append('title', this.title);
 
@@ -295,6 +324,11 @@ window.app = new Vue({
         deleteCalendar(e, calendar) {
             e.stopPropagation();
             e.preventDefault();
+
+            if (!this.authorities.collaborate) {
+                alert('편집할 권한이 없습니다!');
+                return;
+            }
 
             if (!confirm('달력은 복구할 수 없습니다.\n정말 삭제하시겠습니까?')) {
                 return;
@@ -323,6 +357,11 @@ window.app = new Vue({
                 });
         },
         selectOption(e) {
+            if (!this.authorities.collaborate) {
+                alert('편집할 권한이 없습니다!');
+                return;
+            }
+
             this.$set(this.dayObject, 'option', e);
 
             let data = new FormData;
@@ -334,6 +373,11 @@ window.app = new Vue({
             });
         },
         noteChanged(e) {
+            if (!this.authorities.collaborate) {
+                alert('편집할 권한이 없습니다!');
+                return;
+            }
+
             let data = new FormData;
             data.append('note', this.dayObject.note);
 
@@ -350,6 +394,28 @@ window.app = new Vue({
                 return;
 
             $(targetElem).width($(wrapElem).width());
+        },
+        copyUrl(e) {
+            $(e.target).tooltip({
+                trigger: 'manual'
+            });
+            this.$refs['share-url'].select();
+            document.execCommand('copy');
+            $(e.target).tooltip('show');
+
+            window.setTimeout(() => {
+                    $(e.target).tooltip('hide');
+                },
+                500);
+        },
+        changeViewAuthority(e) {
+            let data = new FormData;
+            data.append('value', this.sharingOptions.view);
+
+            fetch(`/api/calendars/${app.calendarId}/authorities/view`, {
+                method: 'POST',
+                body: data
+            });
         }
     },
     computed: {
