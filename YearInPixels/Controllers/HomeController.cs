@@ -94,6 +94,68 @@ namespace YearInPixels.Controllers
             return RedirectToAction("Calendar", new { id = calendar.Id });
         }
 
+        [HttpPost]
+        [Route("api/calendars")]
+        public async Task<IActionResult> CreateApi(string title, int? year)
+        {
+            var deviceId = Request.Cookies["deviceId"];
+            if (String.IsNullOrWhiteSpace(deviceId))
+            {
+                deviceId = RandomIdentityGenerator.Generate();
+                Response.Cookies.Append("deviceId", deviceId, new CookieOptions { Expires = DateTimeOffset.Now.AddYears(10) });
+            }
+
+            var user = await _session.GetUserAsync();
+
+            var calendar = new Calendar
+            {
+                Options = new[]
+                {
+                    new Option
+                    {
+                        Label = "너무 행복한 날",
+                        Color = "#0fbcf9"
+                    },
+                    new Option
+                    {
+                        Label = "상쾌한 날",
+                        Color = "#05c46b"
+                    },
+                    new Option
+                    {
+                        Label = "평범한 날",
+                        Color = "#ffd32a"
+                    },
+                    new Option
+                    {
+                        Label = "피곤한 날",
+                        Color = "#f53b57"
+                    },
+                    new Option
+                    {
+                        Label = "상처 받은 날",
+                        Color = "#3c40c6"
+                    },
+                    new Option
+                    {
+                        Label = "끔찍한 날",
+                        Color = "#1e272e"
+                    }
+                },
+                Title = title ?? "나의 기분 달력",
+                Year = year ?? DateTimeOffset.UtcNow.AddHours(9).Year,
+                OwnerDeviceId = deviceId,
+                IsPrivate = true,
+                Owner = user
+            };
+
+            _database.Calendars.Add(calendar);
+            await _database.SaveChangesAsync();
+
+            return Created(Url.Action("GetCalendar", "Calendar", new {calendarId = calendar.Id}),
+                new {id = calendar.Id});
+        }
+
         [Route("{id}")]
         public async Task<IActionResult> Calendar(string id)
         {
